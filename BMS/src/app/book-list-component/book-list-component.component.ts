@@ -6,7 +6,7 @@ import { Book } from '../models/book.model'; // Adjust the import path as necess
   templateUrl: './book-list-component.component.html',
   styleUrls: ['./book-list-component.component.css']
 })
-export class BookListComponentComponent implements OnInit {
+export class BookListComponent implements OnInit {
 
   @Input() book: Book;
   @Output() onRemoveBook = new EventEmitter<number>();
@@ -26,7 +26,7 @@ export class BookListComponentComponent implements OnInit {
 
   ngOnInit(): void {
   }
-  
+
   deleteBookClicked() {
     this.onRemoveBook.emit(this.book.id);
   }

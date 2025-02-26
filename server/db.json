@@ -1,3 +1,31 @@
 {
-  "books": []
+  "books": [
+    {
+      "title": "dwerf",
+      "author": "Tulsidas",
+      "isbn": "",
+      "price": "",
+      "pubDate": "",
+      "genre": "",
+      "id": 1740568218376
+    },
+    {
+      "title": "radhe",
+      "author": "",
+      "isbn": "232",
+      "price": "",
+      "pubDate": "",
+      "genre": "",
+      "id": 1740568221975
+    },
+    {
+      "title": "we",
+      "author": "",
+      "isbn": "",
+      "price": "",
+      "pubDate": "2025-03-01",
+      "genre": "",
+      "id": 1740568226876
+    }
+  ]
 }

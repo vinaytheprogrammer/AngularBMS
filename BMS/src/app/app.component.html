@@ -1,110 +1,50 @@
+<!-- Header -->
 <header class="bg-blue-600 text-white py-4 shadow-md">
-  <div class="container mx-auto flex justify-between items-center px-4">
+  <div class="container mx-auto flex justify-between items-center px-6">
     <!-- Logo -->
-    <a href="/" class="text-md font-bold">MyLogo</a>
+    <a href="/" class="text-lg tracking-wide">📚</a>
 
-  <div>
-    <p class="text-xl font-bold">Book Management System</p>
-  </div>
-    <!-- Navigation -->
-    <nav>
-      <ul class="flex space-x-6">
-        
-      </ul>
-    </nav>
+    <div>
+      <p class="text-2xl font-bold"> Book Management System</p>
+    </div>
   </div>
 </header>
 
-<!-- Open Modal Button -->
-<button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600"
-  (click)="toggleModal()" #addBookButton>Add Book</button>
-
-<!-- Modal -->
-<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" id="exampleModal">
-  <div class="bg-white p-6 rounded-md shadow-lg w-96">
-    
-    <!-- Modal Header -->
-    <div class="flex justify-between items-center border-b pb-2 mb-4">
-      <h5 class="text-xl font-semibold">Enter Book Information</h5>
-      <button type="button" class="text-gray-500 hover:text-gray-700" (click)="toggleModal()">✖</button>
-    </div>
-
-    <!-- Modal Content -->
-    <form [formGroup]="bookForm">
-      <!-- <input type="text" class="border p-2 rounded-md w-full" placeholder="First Name" formControlName="firstname">
-      <input type="text" class="border p-2 rounded-md w-full mt-2" placeholder="Last Name" formControlName="lastname">
-     -->
-      <div>
-        <label for="title" class="block text-sm font-medium text-gray-600">Book Title</label>
-        <input type="text" id="title" name="title" formControlName="title" placeholder="Enter book title" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
-      </div>
-      
-      <div>
-        <label for="author" class="block text-sm font-medium text-gray-600">Author</label>
-        <input type="text" id="author" name="author" formControlName="author" placeholder="Enter author name" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
-      </div>
-      
-      <div>
-        <label for="isbn" class="block text-sm font-medium text-gray-600">ISBN</label>
-        <input type="text" id="isbn" name="isbn" formControlName="isbn" placeholder="Enter ISBN number" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
-      </div>
-      
-      <div>
-        <label for="price" class="block text-sm font-medium text-gray-600">Price</label>
-        <input type="text" id="price" name="price" formControlName="price" placeholder="Enter Price" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
-      </div>
-      
-      <div>
-        <label for="pub_date" class="block text-sm font-medium text-gray-600">Publication Date</label>
-        <input type="date" id="pubDate" name="pubDate" formControlName="pubDate" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
-      </div>
-      
-      <div>
-        <label for="genre" class="block text-sm font-medium text-gray-600">Genre</label>
-        <select id="genre" name="genre" formControlName="genre" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
-          <option value="">Select Genre</option>
-          <option value="fiction">Fiction</option>
-          <option value="non-fiction">Non-Fiction</option>
-          <option value="mystery">Mystery</option>
-          <option value="fantasy">Fantasy</option>
-          <option value="biography">Biography</option>
-        </select>
-      </div>
-    
-    </form>
-
-    <!-- Modal Footer -->
-    <div class="mt-4 flex justify-end">
-      <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600"
-        (click)="addBook(); toggleModal()">Insert</button>
-    </div>
-
+<!-- Main Content -->
+<div class="flex flex-col items-center min-h-screen bg-gray-100 p-6">
+  <!-- Book Form -->
+  <div class="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+    <app-book-form-component (booksChanged)="onBooksChanged($event)"></app-book-form-component>
   </div>
-</div>
 
+  <!-- Books Table (Visible when books exist) -->
+  <div *ngIf="booksToDisplay.length > 0" class="w-full max-w-4xl bg-white shadow-lg rounded-lg mt-6 p-6">
+    <table class="w-full border-collapse border border-gray-300">
+      <thead>
+        <tr class="bg-gradient-to-r from-gray-200 to-gray-100 text-gray-700 text-lg">
+          <th class="border px-4 py-3 w-40 text-left">Title</th>
+          <th class="border px-4 py-3 w-40 text-left">Author</th>
+          <th class="border px-4 py-3 w-40 text-left">ISBN</th>
+          <th class="border px-4 py-3 w-40 text-left">Price</th>
+          <th class="border px-4 py-3 w-40 text-left">Publication Date</th>
+          <th class="border px-4 py-3 w-40 text-left">Genre</th>
+          <th class="border px-4 py-3 w-40 text-center">Actions</th>
+        </tr>
+      </thead>
+    </table>
 
-
-<app-book-form-component></app-book-form-component>
-
-<div class="container mx-auto p-4 bg-white shadow-lg rounded-lg">
-  
-<table class="w-full border-collapse border border-gray-300">
-  <tr class="bg-gray-100 text-gray-700 text-lg italic">
-    <th class="border px-4 py-2 w-40">Title</th>
-    <th class="border px-4 py-2 w-40">Author</th>
-    <th class="border px-4 py-2 w-40">ISBN</th>
-    <th class="border px-4 py-2 w-40">Price</th>
-    <th class="border px-4 py-2 w-40">Publication Date</th>
-    <th class="border px-4 py-2 w-40">Genre</th>
-    <th class="border px-4 py-2 w-40">Actions</th>
-  </tr>
-</table>
-
-<div class="row mt-4" *ngFor="let book of booksToDisplay; let ei = index;">
-  <div class="col">
-    <app-book-list-component [book]="book" (onRemoveBook)="removeBook($event)"
-    (onEditBook)="editBook($event)"></app-book-list-component>
+    <!-- Book List -->
+    <div class="mt-4 space-y-4" *ngFor="let book of booksToDisplay; let ei = index;">
+      <app-book-list-component 
+        [book]="book" 
+        (onRemoveBook)="RemoveBook($event)"
+        (onEditBook)="EditBook($event)">
+      </app-book-list-component>
+    </div>
   </div>
-</div>
 
+  <!-- No Books Message -->
+  <div *ngIf="booksToDisplay.length == 0" class="w-full max-w-lg bg-white shadow-lg rounded-lg p-6 mt-6 text-center">
+    <p class="text-gray-600 text-lg font-medium">No Books available. Please add some books...</p>
+  </div>
 </div>
