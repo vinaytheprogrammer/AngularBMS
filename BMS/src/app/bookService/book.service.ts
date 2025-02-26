@@ -22,4 +22,4 @@ export class BookService {
   deleteBook(id : string){
     return this.http.delete(this.baseUrl+'/'+id);
   }
-}
+} 

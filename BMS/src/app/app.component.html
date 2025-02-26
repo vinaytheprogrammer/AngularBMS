@@ -17,7 +17,7 @@
 
 <!-- Open Modal Button -->
 <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600"
-  (click)="toggleModal()">Add Book</button>
+  (click)="toggleModal()" #addBookButton>Add Book</button>
 
 <!-- Modal -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" id="exampleModal">
@@ -76,7 +76,7 @@
     <!-- Modal Footer -->
     <div class="mt-4 flex justify-end">
       <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600"
-        (click)="addEmployee(); toggleModal()">Insert</button>
+        (click)="addBook(); toggleModal()">Insert</button>
     </div>
 
   </div>
@@ -102,7 +102,8 @@
 
 <div class="row mt-4" *ngFor="let book of booksToDisplay; let ei = index;">
   <div class="col">
-    <app-book-list-component [book]="book"></app-book-list-component>
+    <app-book-list-component [book]="book" (onRemoveBook)="removeBook($event)"
+    (onEditBook)="editBook($event)"></app-book-list-component>
   </div>
 </div>
 

@@ -26,11 +26,12 @@ export class BookListComponentComponent implements OnInit {
 
   ngOnInit(): void {
   }
+  
   deleteBookClicked() {
-    this.onRemoveBook.emit(this.book.isbn);
+    this.onRemoveBook.emit(this.book.id);
   }
 
   editBookClicked(){
-    this.onEditBook.emit(this.book.isbn);
+    this.onEditBook.emit(this.book.id);
   }
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
 import { Book } from './models/book.model';
 import { BookService } from './bookService/book.service';
@@ -10,6 +10,8 @@ import { BookService } from './bookService/book.service';
 })
 
 export class AppComponent {
+
+  @ViewChild('addBookButton') addBookButton: any;
   title = 'BMS';
   bookForm : FormGroup;
   books: Book[];
@@ -32,14 +34,14 @@ export class AppComponent {
     });
 
     this.bookService.getBooks().subscribe((res) => {
-      for (let emp of res) {
-        this.books.unshift(emp);
+      for (let book of res) {
+        this.books.unshift(book);
       }
       this.booksToDisplay = this.books;
     });
   } 
 
-  addEmployee() {
+  addBook() {
     let book: Book = {
       title: this.Title.value,
       author: this.Author.value,
@@ -60,6 +62,35 @@ export class AppComponent {
     document.getElementById('exampleModal')?.classList.toggle('hidden');
   }
 
+
+  removeBook(event: any) {
+    this.books.forEach((val, index) => {
+      if (val.id === parseInt(event)) {
+        this.bookService.deleteBook(event).subscribe((res) => {
+          this.books.splice(index, 1);
+        });
+      }
+    });
+  }
+
+  editBook(event: any) {
+    this.books.forEach((val, ind) => {
+      if (val.id === event) {
+        this.setForm(val);
+      }
+    });
+    this.removeBook(event);
+    this.addBookButton.nativeElement.click();
+  }
+
+  setForm(book: Book) {
+    this.Title.setValue(book.title);
+    this.Author.setValue(book.author);
+    this.Isbn.setValue(book.isbn);
+    this.Price.setValue(book.price);
+    this.PubDate.setValue(book.pubDate);
+    this.Genre.setValue(book.genre);
+  }
 
   clearForm() {
     this.Title.setValue('');
