@@ -17,7 +17,7 @@
 
 <!-- Open Modal Button -->
 <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600"
-  (click)="toggleModal()">Add Employee</button>
+  (click)="toggleModal()">Add Book</button>
 
 <!-- Modal -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" id="exampleModal">
@@ -25,7 +25,7 @@
     
     <!-- Modal Header -->
     <div class="flex justify-between items-center border-b pb-2 mb-4">
-      <h5 class="text-xl font-semibold">Enter Employee Information</h5>
+      <h5 class="text-xl font-semibold">Enter Book Information</h5>
       <button type="button" class="text-gray-500 hover:text-gray-700" (click)="toggleModal()">✖</button>
     </div>
 
@@ -76,7 +76,7 @@
     <!-- Modal Footer -->
     <div class="mt-4 flex justify-end">
       <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600"
-        (click)="addEmployee()">Insert</button>
+        (click)="addEmployee(); toggleModal()">Insert</button>
     </div>
 
   </div>
@@ -85,5 +85,25 @@
 
 
 <app-book-form-component></app-book-form-component>
-<app-book-list-component></app-book-list-component>
 
+<div class="container mx-auto p-4 bg-white shadow-lg rounded-lg">
+  
+<table class="w-full border-collapse border border-gray-300">
+  <tr class="bg-gray-100 text-gray-700 text-lg italic">
+    <th class="border px-4 py-2 w-40">Title</th>
+    <th class="border px-4 py-2 w-40">Author</th>
+    <th class="border px-4 py-2 w-40">ISBN</th>
+    <th class="border px-4 py-2 w-40">Price</th>
+    <th class="border px-4 py-2 w-40">Publication Date</th>
+    <th class="border px-4 py-2 w-40">Genre</th>
+    <th class="border px-4 py-2 w-40">Actions</th>
+  </tr>
+</table>
+
+<div class="row mt-4" *ngFor="let book of booksToDisplay; let ei = index;">
+  <div class="col">
+    <app-book-list-component [book]="book"></app-book-list-component>
+  </div>
+</div>
+
+</div>
