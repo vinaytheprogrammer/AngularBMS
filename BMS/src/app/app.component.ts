@@ -12,9 +12,11 @@ export class AppComponent {
   @ViewChild(BookFormComponent) bookFormComponent!: BookFormComponent;
 
   booksToDisplay: Book[] = [];
+  books: Book[]=[];
 
   onBooksChanged(updatedBooks: Book[]) {
     this.booksToDisplay = updatedBooks;
+    this.books = updatedBooks;
   }
 
   
@@ -24,5 +26,20 @@ export class AppComponent {
 
   RemoveBook(bookId: number) {
     this.bookFormComponent.removeBook(bookId); // Call removeBook from the child
+  }
+
+  searchEmployees(event: any) {
+    let filteredBooks: Book[] = [];
+
+    if (event === '') {
+      this.booksToDisplay = this.books;
+    } else {
+      filteredBooks = this.books.filter((val, index) => {
+        let targetKey = val.title.toLowerCase() + '' + val.author.toLowerCase();
+        let searchKey = event.toLowerCase();
+        return targetKey.includes(searchKey);
+      });
+      this.booksToDisplay = filteredBooks;
+    }
   }
 }

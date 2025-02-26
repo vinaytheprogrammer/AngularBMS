@@ -13,9 +13,23 @@
 <!-- Main Content -->
 <div class="flex flex-col items-center min-h-screen bg-gray-100 p-6">
   <!-- Book Form -->
-  <div class="w-full max-w-2xl bg-white shadow-lg rounded-lg p-6">
+  <div class="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6 space-y-4">
+    <!-- Book Form Component -->
     <app-book-form-component (booksChanged)="onBooksChanged($event)"></app-book-form-component>
+  
+    <!-- Search Employees Section -->
+    <div>
+      <input 
+        type="search" 
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition placeholder-gray-500" 
+        placeholder="🔍 Search Employees..."
+        (input)="searchEmployees(searchInput.value)" 
+        #searchInput
+      />
+     
+    </div>
   </div>
+  
 
   <!-- Books Table (Visible when books exist) -->
   <div *ngIf="booksToDisplay.length > 0" class="w-full max-w-4xl bg-white shadow-lg rounded-lg mt-6 p-6">
