@@ -1,5 +1,7 @@
-import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { switchMap, tap, takeUntil } from 'rxjs/operators';
 import { Book } from '../models/book.model';
 import { BookService } from '../bookService/book.service';
 
@@ -8,126 +10,91 @@ import { BookService } from '../bookService/book.service';
   templateUrl: './book-form-component.component.html',
   styleUrls: ['./book-form-component.component.css']
 })
-export class BookFormComponent {
+export class BookFormComponent implements OnInit, OnDestroy {
   @ViewChild('addBookButton') addBookButton: any;
-  
   @Output() booksChanged = new EventEmitter<Book[]>();
- 
 
-  title = 'BMS';
   bookForm: FormGroup;
-  books: Book[];
-  booksToDisplay: Book[];
+  books$ = new BehaviorSubject<Book[]>([]); // Store book list reactively
+  private unsubscribe$ = new Subject<void>(); // For unsubscribing Observables
 
   constructor(private fb: FormBuilder, private bookService: BookService) {
-    this.bookForm = this.fb.group({});
-    this.books = [];
-    this.booksToDisplay = this.books;
+    this.bookForm = this.fb.group({
+      title: [''],
+      author: [''],
+      isbn: [''],
+      price: [''],
+      pubDate: [''],
+      genre: ['']
+    });
   }
 
   ngOnInit(): void {
-    this.bookForm = this.fb.group({
-      title: this.fb.control(''),
-      author: this.fb.control(''),
-      isbn: this.fb.control(''),
-      price: this.fb.control(''),
-      pubDate: this.fb.control(''),
-      genre: this.fb.control('')
-    });
-
-    this.bookService.getBooks().subscribe((res) => {
-      for (let book of res) {
-        this.books.unshift(book);
-      }
-      this.booksToDisplay = this.books;
-      this.booksChanged.emit(this.booksToDisplay); // Emit the updated books list to parent
-    });
+    this.loadBooks(); // Initial load
   }
 
-  removeBook(event: any) {
-    this.books.forEach((val, index) => {
-      if (val.id === parseInt(event)) {
-        this.bookService.deleteBook(event).subscribe((res) => {
-          this.books.splice(index, 1);
-          this.booksToDisplay = this.books;
-          this.booksChanged.emit(this.booksToDisplay); // Emit the updated list after deletion
-        });
-      }
-    });
-  }
-
-  editBook(event: any) {
-    this.books.forEach((val, ind) => {
-      if (val.id === event) {
-        this.setForm(val);
-      }
-    });
-    this.removeBook(event); // Optionally, you can trigger removal of book if needed
-    this.addBookButton.nativeElement.click();
-    // this.editBookEvent.emit(event); // Emit the ID of the book to be edited
-  }
-
-  setForm(book: Book) {
-    this.Title.setValue(book.title);
-    this.Author.setValue(book.author);
-    this.Isbn.setValue(book.isbn);
-    this.Price.setValue(book.price);
-    this.PubDate.setValue(book.pubDate);
-    this.Genre.setValue(book.genre);
-  }
-
-  clearForm() {
-    this.Title.setValue('');
-    this.Author.setValue('');
-    this.Isbn.setValue('');
-    this.Price.setValue('');
-    this.PubDate.setValue('');
-    this.Genre.setValue('');
-  }
-
-  public get Title(): FormControl {
-    return this.bookForm.get('title') as FormControl;
-  }
-
-  public get Author(): FormControl {
-    return this.bookForm.get('author') as FormControl;
-  }
-
-  public get Isbn(): FormControl {
-    return this.bookForm.get('isbn') as FormControl;
-  }
-
-  public get Price(): FormControl {
-    return this.bookForm.get('price') as FormControl;
-  }
-
-  public get PubDate(): FormControl {
-    return this.bookForm.get('pubDate') as FormControl;
-  }
-
-  public get Genre(): FormControl {
-    return this.bookForm.get('genre') as FormControl;
+  loadBooks() {
+    this.bookService.getBooks()
+      .pipe(
+        tap(books => {this.books$.next(books);  this.booksChanged.emit(books);}), // Update BehaviorSubject
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe();
   }
 
   addBook() {
-    let book: Book = {
-      title: this.Title.value,
-      author: this.Author.value,
-      isbn: this.Isbn.value,
-      price: this.Price.value,
-      pubDate: this.PubDate.value,
-      genre: this.Genre.value
-    };
+    const book: Book = this.bookForm.value;
 
-    this.bookService.postBook(book).subscribe((res) => {
-      this.books.unshift(res);
-      this.booksToDisplay = this.books;
-      this.booksChanged.emit(this.booksToDisplay); // Emit the updated books list
-      this.clearForm();
+    this.bookService.postBook(book)
+      .pipe(
+        switchMap(() => this.bookService.getBooks()), // Refresh list after adding
+        tap(books => {
+          this.books$.next(books);
+          this.booksChanged.emit(books);
+          this.clearForm();
+        }),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe();
+  }
+
+  removeBook(bookId: any) {
+    this.bookService.deleteBook(bookId.toString())
+      .pipe(
+        switchMap(() => this.bookService.getBooks()), // Refresh list after deletion
+        tap(books => {
+          this.books$.next(books);
+          this.booksChanged.emit(books);
+        }),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe();
+  }
+
+  editBook(book: Book) {
+    this.bookForm.setValue({
+      title: book.title,
+      author: book.author,
+      isbn: book.isbn,
+      price: book.price,
+      pubDate: book.pubDate,
+      genre: book.genre
     });
+
+    this.removeBook(book.id); // Remove the book from the list
+    this.toggleModal();
+  }
+
+  clearForm() {
+    this.bookForm.reset();
   }
 
   toggleModal() {
     document.getElementById('exampleModal')?.classList.toggle('hidden');
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete(); // Prevent memory leaks
   }
 }

@@ -1,6 +1,6 @@
 <!-- Open Modal Button -->
 <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-green-600"
-  (click)="toggleModal()" #addBookButton>Add Book</button>
+  (click)="toggleModal()">Add Book</button>
 
 <!-- Modal -->
 <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden" id="exampleModal">
@@ -14,35 +14,34 @@
 
     <!-- Modal Content -->
     <form [formGroup]="bookForm">
-      
       <div>
         <label for="title" class="block text-sm font-medium text-gray-600">Book Title</label>
-        <input type="text" id="title" name="title" formControlName="title" placeholder="Enter book title" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
+        <input type="text" id="title" formControlName="title" placeholder="Enter book title" required class="w-full p-2 border rounded">
       </div>
-      
+
       <div>
         <label for="author" class="block text-sm font-medium text-gray-600">Author</label>
-        <input type="text" id="author" name="author" formControlName="author" placeholder="Enter author name" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
+        <input type="text" id="author" formControlName="author" placeholder="Enter author name" required class="w-full p-2 border rounded">
       </div>
-      
+
       <div>
         <label for="isbn" class="block text-sm font-medium text-gray-600">ISBN</label>
-        <input type="text" id="isbn" name="isbn" formControlName="isbn" placeholder="Enter ISBN number" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
+        <input type="text" id="isbn" formControlName="isbn" placeholder="Enter ISBN number" required class="w-full p-2 border rounded">
       </div>
-      
+
       <div>
         <label for="price" class="block text-sm font-medium text-gray-600">Price</label>
-        <input type="text" id="price" name="price" formControlName="price" placeholder="Enter Price" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
+        <input type="text" id="price" formControlName="price" placeholder="Enter Price" required class="w-full p-2 border rounded">
       </div>
-      
+
       <div>
         <label for="pub_date" class="block text-sm font-medium text-gray-600">Publication Date</label>
-        <input type="date" id="pubDate" name="pubDate" formControlName="pubDate" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
+        <input type="date" id="pubDate" formControlName="pubDate" required class="w-full p-2 border rounded">
       </div>
-      
+
       <div>
         <label for="genre" class="block text-sm font-medium text-gray-600">Genre</label>
-        <select id="genre" name="genre" formControlName="genre" required class="w-full p-2 text-sm border border-gray-300 rounded focus:ring focus:ring-blue-300 focus:outline-none">
+        <select id="genre" formControlName="genre" required class="w-full p-2 border rounded">
           <option value="">Select Genre</option>
           <option value="fiction">Fiction</option>
           <option value="non-fiction">Non-Fiction</option>
@@ -51,7 +50,6 @@
           <option value="biography">Biography</option>
         </select>
       </div>
-    
     </form>
 
     <!-- Modal Footer -->
@@ -59,6 +57,5 @@
       <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600"
         (click)="addBook(); toggleModal()">Insert</button>
     </div>
-
   </div>
 </div>

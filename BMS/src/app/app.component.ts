@@ -26,7 +26,10 @@ export class AppComponent {
   }
   
   EditBook(bookId: number) {
-    this.bookFormComponent.editBook(bookId); // Call editBook from the child
+    const bookToEdit = this.books.find(book => book.id === bookId);
+    if (bookToEdit) {
+      this.bookFormComponent.editBook(bookToEdit); // Pass the book object
+    }
   }
 
   RemoveBook(bookId: number) {
