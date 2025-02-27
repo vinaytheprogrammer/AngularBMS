@@ -1,6 +1,6 @@
 import { Component, ViewChild, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { switchMap, tap, takeUntil } from 'rxjs/operators';
 import { Book } from '../models/book.model';
 import { BookService } from '../bookService/book.service';
@@ -11,7 +11,6 @@ import { BookService } from '../bookService/book.service';
   styleUrls: ['./book-form-component.component.css']
 })
 export class BookFormComponent implements OnInit, OnDestroy {
-  @ViewChild('addBookButton') addBookButton: any;
   @Output() booksChanged = new EventEmitter<Book[]>();
 
   bookForm: FormGroup;
@@ -81,8 +80,9 @@ export class BookFormComponent implements OnInit, OnDestroy {
       genre: book.genre
     });
 
+    //instead of creating a put request we can remove the book and add it again
     this.removeBook(book.id); // Remove the book from the list
-    this.toggleModal();
+    this.toggleModal(); // open the addBook form and after inserting call the addBook method  
   }
 
   clearForm() {

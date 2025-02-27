@@ -15,6 +15,7 @@ export class AppComponent {
   booksToDisplay: Book[] = [];
   books: Book[]=[];
 
+  // this method emits the updated books list from the child component
   onBooksChanged(updatedBooks: Book[]) {
     this.booksToDisplay = updatedBooks;
     this.books = updatedBooks;
