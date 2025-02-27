@@ -1,4 +1,7 @@
 <!-- Header -->
+ <div *ngIf="!isRouterActive()" >
+
+
 <header class="bg-blue-600 text-white py-4 shadow-md">
   <div class="container mx-auto flex justify-between items-center px-6">
     <!-- Logo -->
@@ -64,4 +67,9 @@
 </div>
 
 
-<router-outlet></router-outlet>
+</div>
+
+<!-- Show router-outlet only when a route is triggered -->
+<div *ngIf="isRouterActive()">
+  <router-outlet></router-outlet> // Page  Not Found
+</div>

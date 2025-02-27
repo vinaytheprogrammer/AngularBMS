@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { Book } from './models/book.model';
 import { BookFormComponent } from './book-form-component/book-form-component.component';  
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,10 @@ export class AppComponent {
     this.books = updatedBooks;
   }
 
+  constructor(private router: Router) {}
+  isRouterActive(): boolean {
+    return this.router.url !== '/'; // If URL is NOT "/", show router-outlet
+  }
   
   EditBook(bookId: number) {
     this.bookFormComponent.editBook(bookId); // Call editBook from the child
