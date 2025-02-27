@@ -7,12 +7,14 @@ import { BookListComponent} from './book-list-component/book-list-component.comp
 import { BookFormComponent } from './book-form-component/book-form-component.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     BookListComponent,
-    BookFormComponent
+    BookFormComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,

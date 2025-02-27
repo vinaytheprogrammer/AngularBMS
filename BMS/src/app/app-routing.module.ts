@@ -1,7 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 
-const routes: Routes = [];
+const routes: Routes = [
+  { path: '', redirectTo: 'books', pathMatch: 'full' }, // Default Route
+  { path: 'i', component: PageNotFoundComponent } // 404 Page
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
