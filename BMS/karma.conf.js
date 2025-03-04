@@ -37,7 +37,13 @@ module.exports = function (config) {
     colors: true,
     logLevel: config.LOG_INFO,
     autoWatch: true,
-    browsers: ['Chrome'],
+    browsers: ['Brave'],
+    customLaunchers: {
+      Brave: {
+        base: 'Chrome',
+        executablePath:  process.env.CHROME_BIN || '/usr/bin/brave-browser' // Replace with actual Brave path
+      }
+    },
     singleRun: false,
     restartOnFileChange: true
   });

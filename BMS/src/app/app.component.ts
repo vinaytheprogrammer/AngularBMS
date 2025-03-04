@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 export class AppComponent {
   @ViewChild(BookFormComponent) bookFormComponent!: BookFormComponent;
 
+  title : string= 'BMS';
   booksToDisplay: Book[] = [];
   books: Book[]=[];
 

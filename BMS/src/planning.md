@@ -1,5 +1,5 @@
-how solid implements in angular 
-how design patterns implements in angular
+how solid implements in angular,          later
+how design patterns implements in angular,     later
 angular 19 intro 
 rest of the video of playlist of angular 13
 one more project on BMS by adding a little more related functioanlity 
