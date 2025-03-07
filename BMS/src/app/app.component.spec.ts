@@ -4,7 +4,14 @@ import { AppComponent } from './app.component';
 import { BookFormComponent } from './book-form-component/book-form-component.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { of } from 'rxjs';
+import { BookService } from './bookService/book.service';
 
+class MockBookService {
+  getBooks() {
+    return of([]); // Returns an empty observable array
+  }
+}
 
 describe('AppComponent', () => {
 
@@ -16,11 +23,12 @@ describe('AppComponent', () => {
    
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule, ReactiveFormsModule, HttpClientModule
+        RouterTestingModule, ReactiveFormsModule
       ],
       declarations: [
         AppComponent, BookFormComponent
       ],
+      providers: [{ provide: BookService, useClass: MockBookService }],
     }).compileComponents();
 
   });
