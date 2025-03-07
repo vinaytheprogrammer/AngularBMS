@@ -15,14 +15,14 @@ export class BookFormComponent implements OnInit, OnDestroy {
 
   bookForm: FormGroup;
   books$ = new BehaviorSubject<Book[]>([]); // Store book list reactively
-  private unsubscribe$ = new Subject<void>(); // For unsubscribing Observables
+  public unsubscribe$ = new Subject<void>(); // For unsubscribing Observables
 
   constructor(private fb: FormBuilder, private bookService: BookService) {
     this.bookForm = this.fb.group({
       title: [''],
       author: [''],
-      isbn: [''],
-      price: [''],
+      isbn: [0],   // Default to 0 for numeric fields
+      price: [0],  // Default to 0 for numeric fields
       pubDate: [''],
       genre: ['']
     });
@@ -86,7 +86,14 @@ export class BookFormComponent implements OnInit, OnDestroy {
   }
 
   clearForm() {
-    this.bookForm.reset();
+    this.bookForm.reset({
+      title: '',
+      author: '',
+      isbn: 0,
+      price: 0,
+      pubDate: '',
+      genre: ''
+    });
   }
 
   toggleModal() {

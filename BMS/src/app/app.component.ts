@@ -38,7 +38,7 @@ export class AppComponent {
     this.bookFormComponent.removeBook(bookId); // Call removeBook from the child
   }
 
-  searchEmployees(event: any) {
+  searchBooks(event: any) {
     let filteredBooks: Book[] = [];
 
     if (event === '') {
