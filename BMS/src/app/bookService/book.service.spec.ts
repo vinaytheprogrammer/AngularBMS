@@ -5,7 +5,7 @@ import { Book } from '../models/book.model';
 
 //fdescribe() is used to run only the tests within the fdescribe block
 
-fdescribe('BookService', () => {
+describe('BookService', () => {
   let service: BookService;
   let httpMock: HttpTestingController; // control fake HTTP requests
 

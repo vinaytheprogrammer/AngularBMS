@@ -1,29 +1,70 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
+import { BookFormComponent } from './book-form-component/book-form-component.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+
 
 describe('AppComponent', () => {
+
+  let component : AppComponent;
+  let fixture : ComponentFixture<AppComponent>;
+  
+
   beforeEach(async () => {
+   
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule, ReactiveFormsModule, HttpClientModule
       ],
       declarations: [
-        AppComponent
+        AppComponent, BookFormComponent
       ],
     }).compileComponents();
+
   });
 
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges(); //dom render
+  });
+
+
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(component).toBeTruthy(); //component should not be null
   });
 
   it(`should have as title 'BMS'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('BMS');
+    expect(component.title).toEqual('BMS');
   });
+
+  it('should initialize with an empty books array', () => {
+    expect(component.books).toEqual([]);
+  });
+
+  it('should initialize with an empty booksToDisplay array', () => {
+    expect(component.booksToDisplay).toEqual([]);
+  });
+
+  it('should update booklist when onBooksChanged is called',()=>{
+    const mockBooks = [
+      {
+        "title": "Ramayana",
+        "author": "Tulsidas",
+        "isbn": 1,
+        "price": 211,
+        "pubDate": "2025-02-25",
+        "genre": "non-fiction",
+        "id": 1
+      }
+    ];
+    component.onBooksChanged(mockBooks); 
+    expect(component.booksToDisplay).toEqual(mockBooks);
+    expect(component.books).toEqual(mockBooks);
+  })
+
+
 
 });
