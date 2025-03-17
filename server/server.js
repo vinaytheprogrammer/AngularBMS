@@ -1,6 +1,25 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
+const mysql = require( 'mysql2' );
+
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Vinay@123',
+    database: 'bms'
+});
+
+try{
+    connection.query('show tables', function(err, rows, fields) {
+        if (err) throw err;
+        console.log('Tables: ', rows);
+    });
+}
+catch(err){
+    console.log(err);
+}
+connection.end();
 
 const app = express();
 const PORT = 3000;
