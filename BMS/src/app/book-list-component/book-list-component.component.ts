@@ -28,10 +28,10 @@ export class BookListComponent implements OnInit {
   }
 
   deleteBookClicked() {
-    this.onRemoveBook.emit(this.book.id);
+    this.onRemoveBook.emit(this.book.isbn);
   }
 
   editBookClicked(){
-    this.onEditBook.emit(this.book.id);
+    this.onEditBook.emit(this.book.isbn);
   }
 }

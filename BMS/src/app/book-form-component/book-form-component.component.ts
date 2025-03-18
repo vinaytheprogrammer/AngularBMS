@@ -1,5 +1,5 @@
 import { Component, ViewChild, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { switchMap, tap, takeUntil } from 'rxjs/operators';
 import { Book } from '../models/book.model';
@@ -21,8 +21,8 @@ export class BookFormComponent implements OnInit, OnDestroy {
     this.bookForm = this.fb.group({
       title: [''],
       author: [''],
-      isbn: [0],   // Default to 0 for numeric fields
-      price: [0],  // Default to 0 for numeric fields
+      isbn: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],   
+      price: ['', [Validators.required, Validators.pattern('^[0-9]*$')]], 
       pubDate: [''],
       genre: ['']
     });
@@ -76,21 +76,29 @@ export class BookFormComponent implements OnInit, OnDestroy {
       author: book.author,
       isbn: book.isbn,
       price: book.price,
-      pubDate: book.pubDate,
+      pubDate: this.formatDate(book.pubDate),
       genre: book.genre
     });
 
     //instead of creating a put request we can remove the book and add it again
-    this.removeBook(book.id); // Remove the book from the list
+    this.removeBook(book.isbn); // Remove the book from the list
     this.toggleModal(); // open the addBook form and after inserting call the addBook method  
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
   }
 
   clearForm() {
     this.bookForm.reset({
       title: '',
       author: '',
-      isbn: 0,
-      price: 0,
+      isbn: '',
+      price: '',
       pubDate: '',
       genre: ''
     });

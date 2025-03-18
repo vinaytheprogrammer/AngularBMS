@@ -1,36 +1,28 @@
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
-const mysql = require( 'mysql2' );
+const mysql = require("mysql2");
 
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Vinay@123',
-    database: 'bms'
+    host: "localhost",
+    user: "root",
+    password: "Vinay@123",
+    database: "bms"
 });
 
-try{
-    connection.query('show tables', function(err, rows, fields) {
-        if (err) throw err;
-        console.log('Tables: ', rows);
-    });
-}
-catch(err){
-    console.log(err);
-}
-connection.end();
+connection.connect(err => {
+    if (err) {
+        console.error("Database connection failed: " + err.stack);
+        return;
+    }
+    console.log("Connected to MySQL database.");
+});
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json()); // Add this to parse JSON body
-app.use(express.urlencoded({ extended: true })); // For form data support
-
-// Middleware
-app.use(cors()); // Allow cross-origin requests
-app.use(express.json()); // Parse JSON request bodies
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 // Logging Middleware
 app.use((req, res, next) => {
@@ -38,52 +30,60 @@ app.use((req, res, next) => {
     next();
 });
 
-// Read data from db.json
-const getData = () => {
-    const data = fs.readFileSync("db.json");
-    return JSON.parse(data);
-};
 
-// GET all data
-app.get("/api", (req, res) => {
-    const data = getData();
-    res.json(data);
-});
-
-// GET a specific resource (e.g., /api/books)
-app.get("/api/:resource", (req, res) => {
-    const data = getData();
-    const resource = req.params.resource;
-    res.json(data[resource] || []);
-});
-
-app.post("/api/:resource", (req, res) => {
-    const data = getData(); 
-    const resource = req.params.resource;
-    
-    if (!data[resource]) data[resource] = [];
-
-    const newItem = req.body;
-    newItem.id = Date.now(); // Generate unique ID
-    data[resource].push(newItem);
-
-    fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
-    res.status(201).json(newItem);
+// GET all data related to books
+app.get("/api/books", (req, res) => {
+    connection.query(`
+        SELECT 
+    b.title, 
+    b.pubDate, 
+    b.genre, 
+    b.price,
+    b.isbn,
+    a.author
+FROM 
+    books b
+JOIN 
+    author a ON b.author_id = a.author_id;
+    `, (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        console.log('get request result',results);
+        res.json(results);
+    });
 });
 
 
-// DELETE: Remove data
-app.delete("/api/:resource/:id", (req, res) => {
-    const data = getData();
-    const resource = req.params.resource;
-    const id = Number(req.params.id);
 
-    if (!data[resource]) return res.status(404).json({ error: "Resource not found" });
+// POST: Insert a new record
+app.post("/api/books", (req, res) => {
+    const newData = req.body;
+    const { author, title, isbn, price, pubDate, genre } = newData;
 
-    data[resource] = data[resource].filter(item => item.id !== id);
-    fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
-    res.json({ message: "Deleted successfully" });
+    // Insert author into author table
+    connection.query(`INSERT INTO author (author, isbn) VALUES (?, ?)`, [author, isbn], (err, authorResults) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const author_id = authorResults.insertId;
+
+        // Insert book into books table
+        connection.query(`INSERT INTO books (title, isbn, price, pubDate, genre, author_id) VALUES (?, ?, ?, ?, ?, ?)`, 
+        [title, isbn, price, pubDate, genre, author_id], (err, bookResults) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.status(201).json({ id: bookResults.insertId, ...newData });
+        });
+    });
 });
+
+// DELETE: Remove a record by ID
+app.delete("/api/books/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    connection.query(`DELETE FROM books WHERE isbn = ?`, [isbn], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (results.affectedRows === 0) return res.status(404).json({ error: "Record not found" });
+        res.json({ message: "Deleted successfully" });
+    });
+});
+   
 
 // Start Server
 app.listen(PORT, () => {

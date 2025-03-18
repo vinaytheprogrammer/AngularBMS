@@ -28,7 +28,7 @@ export class AppComponent {
   }
   
   EditBook(bookId: number) {
-    const bookToEdit = this.books.find(book => book.id === bookId);
+    const bookToEdit = this.books.find(book => book.isbn === bookId);
     if (bookToEdit) {
       this.bookFormComponent.editBook(bookToEdit); // Pass the book object
     }

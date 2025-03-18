@@ -26,12 +26,18 @@
 
       <div>
         <label for="isbn" class="block text-sm font-medium text-gray-600">ISBN</label>
-        <input type="text" id="isbn" formControlName="isbn" placeholder="Enter ISBN number" required class="w-full p-2 border rounded">
+        <input type="text" id="isbn" formControlName="isbn" placeholder="Enter ISBN number" required class="w-full p-2 border rounded" pattern="\d*">
+        <div *ngIf="bookForm.get('isbn')?.invalid && (bookForm.get('isbn')?.dirty || bookForm.get('isbn')?.touched)" class="text-red-500 text-sm">
+          ISBN must be a number.
+        </div>
       </div>
 
       <div>
         <label for="price" class="block text-sm font-medium text-gray-600">Price</label>
-        <input type="text" id="price" formControlName="price" placeholder="Enter Price" required class="w-full p-2 border rounded">
+        <input type="text" id="price" formControlName="price" placeholder="Enter Price" required class="w-full p-2 border rounded" pattern="\d*">
+        <div *ngIf="bookForm.get('price')?.invalid && (bookForm.get('price')?.dirty || bookForm.get('price')?.touched)" class="text-red-500 text-sm">
+          Price must be a number.
+        </div>
       </div>
 
       <div>
