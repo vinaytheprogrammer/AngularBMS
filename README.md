@@ -12,7 +12,7 @@ CREATE TABLE author (
 );
 
 CREATE TABLE books (
-    isbn INT AUTO_INCREMENT PRIMARY KEY,
+    isbn INT PRIMARY KEY,
     title VARCHAR(100),
     genre VARCHAR(50),
     author_id INT,

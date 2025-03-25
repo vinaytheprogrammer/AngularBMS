@@ -2,23 +2,20 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 
-const connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Vinay@123",
-    database: "bms"
-});
-
-connection.connect(err => {
-    if (err) {
-        console.error("Database connection failed: " + err.stack);
-        return;
-    }
-    console.log("Connected to MySQL database.");
-});
-
 const app = express();
 const PORT = 3000;
+const sequelize = require("./config/database");
+const Book = require("./models/Book");
+const Author = require("./models/Author");
+const Category = require("./models/Category");
+
+
+// const db = require("./models");
+
+// // Test the database connection
+// db.sequelize.authenticate()
+//   .then(() => console.log("Database connected ✅"))
+//   .catch((err) => console.error("Database connection error ❌:", err));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,60 +29,128 @@ app.use((req, res, next) => {
 
 
 // GET all data related to books
-app.get("/api/books", (req, res) => {
-    connection.query(`
-        SELECT 
-    b.title, 
-    b.pubDate, 
-    b.genre, 
-    b.price,
-    b.isbn,
-    a.author
-FROM 
-    books b
-JOIN 
-    author a ON b.author_id = a.author_id;
-    `, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        console.log('get request result',results);
-        res.json(results);
-    });
+app.get("/api/books", async (req, res) => {
+    try {
+        const books = await Book.findAll({
+            include: [
+                { model: Author, attributes: ["author_id", "author"] },
+                { model: Category, attributes: ["category_id", "genre"] },
+            ],
+            raw: true, // Flatten the response
+            nest: true, // Keep related data under proper keys
+        });
+        const formattedBooks = books.map(book => ({
+            author: book.Author.author,  // Move author to the top
+            genre: book.Category.genre,  // Move genre to the top
+            category_id: book.category_id,
+            isbn: book.isbn,
+            title: book.title,
+            price: book.price,
+            pubDate: book.pubDate,
+        }));
+
+        res.json(formattedBooks);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 
 
 // POST: Insert a new record
-app.post("/api/books", (req, res) => {
-    const newData = req.body;
-    const { author, title, isbn, price, pubDate, genre } = newData;
+// app.post("/api/books", async (req, res) => {
+//     try {
+//         const { author, title, isbn, price, pubDate, genre } = req.body;
 
-    // Insert author into author table
-    connection.query(`INSERT INTO author (author, isbn) VALUES (?, ?)`, [author, isbn], (err, authorResults) => {
-        if (err) return res.status(500).json({ error: err.message });
+//         // Check if author exists, else create it
+//         let [authorRecord] = await Author.findOrCreate({ where: { author } });
 
-        const author_id = authorResults.insertId;
+//         // Check if category exists, else create it
+//         let [categoryRecord] = await Category.findOrCreate({ where: { genre } });
 
-        // Insert book into books table
-        connection.query(`INSERT INTO books (title, isbn, price, pubDate, genre, author_id) VALUES (?, ?, ?, ?, ?, ?)`, 
-        [title, isbn, price, pubDate, genre, author_id], (err, bookResults) => {
-            if (err) return res.status(500).json({ error: err.message });
-            res.status(201).json({ id: bookResults.insertId, ...newData });
-        });
-    });
+//         // Create a new book
+//         const book = await Book.create({
+//             title,
+//             isbn,
+//             price,
+//             pubDate,
+//             author_id: authorRecord.author_id,
+//             category_id: categoryRecord.category_id,
+//         });
+
+//         res.status(201).json(book);
+//     } catch (err) {
+//         res.status(500).json({ error: err.message });
+//     }
+// });
+
+// If the author or genre already exists, it reuses existing records. 
+// If anything fails midway, no partial data is saved (rollback).
+// for that we are using transaction
+app.post("/api/books", async (req, res) => {
+    
+    const { author, title, isbn, price, pubDate, genre } = req.body;
+    const transaction = await Book.sequelize.transaction(); // Start a transaction
+
+    try {
+        // Check if author already exists
+        let authorRecord = await Author.findOne({ where: { author }, transaction });
+
+        // If author does not exist, create a new one
+        if (!authorRecord) {
+            authorRecord = await Author.create({ author }, { transaction });
+        }
+
+        // Check if category (genre) exists
+        let categoryRecord = await Category.findOne({ where: { genre }, transaction });
+
+        // If category does not exist, create it
+        if (!categoryRecord) {
+            categoryRecord = await Category.create({ genre }, { transaction });
+        }
+
+        // Insert the book with the correct author_id and category_id
+        const book = await Book.create(
+            {
+                title,
+                isbn,
+                price,
+                pubDate,
+                author_id: authorRecord.author_id,
+                category_id: categoryRecord.category_id,
+            },
+            { transaction }
+        );
+
+        await transaction.commit(); // Commit the transaction if everything is successful
+        res.status(201).json({ message: "Book added successfully", book });
+    } catch (error) {
+        await transaction.rollback(); // Rollback if any error occurs
+        res.status(500).json({ error: error.message });
+    }
 });
+
+
 
 // DELETE: Remove a record by ID
-app.delete("/api/books/:isbn", (req, res) => {
-    const isbn = req.params.isbn;
-    connection.query(`DELETE FROM books WHERE isbn = ?`, [isbn], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (results.affectedRows === 0) return res.status(404).json({ error: "Record not found" });
-        res.json({ message: "Deleted successfully" });
-    });
-});
-   
+app.delete("/api/books/:isbn", async (req, res) => {
+    try {
+        const { isbn } = req.params;
+        const book = await Book.findByPk(isbn);
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+        if (!book) return res.status(404).json({ error: "Book not found" });
+
+        await book.destroy();
+        res.json({ message: "Deleted successfully", deletedBook: book });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
+
+
+
+sequelize.sync()
+    .then(() => console.log("Database synchronized"))
+    .catch((err) => console.error("Error syncing database:", err));
+
+app.listen(3000, () => console.log("Server running on port 3000"));

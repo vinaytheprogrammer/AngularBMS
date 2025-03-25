@@ -1,0 +1,9 @@
+{
+  "development": {
+    "username": "root",
+    "password": "Vinay@123",
+    "database": "bms",
+    "host": "db",
+    "dialect": "mysql"
+  }
+}

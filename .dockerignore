@@ -1,0 +1,8 @@
+node_modules/   # Exclude dependencies (will be installed inside the container)
+dist/           # Ignore build files
+.git            # Ignore Git repository
+.env            # Ignore environment variables
+Dockerfile      # Ignore itself
+.dockerignore   # Ignore this file
+docker-compose.yml  # Ignore Docker Compose file
+logs/           # Ignore logs
