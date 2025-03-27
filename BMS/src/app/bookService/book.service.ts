@@ -3,9 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { Book } from '../models/book.model';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable(
+  
+)
+
 export class BookService {
   private baseUrl = 'http://localhost:3000/api/books';
 

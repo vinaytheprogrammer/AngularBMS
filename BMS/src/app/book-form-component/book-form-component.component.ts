@@ -1,6 +1,6 @@
 import { Component, ViewChild, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { switchMap, tap, takeUntil } from 'rxjs/operators';
 import { Book } from '../models/book.model';
 import { BookService } from '../bookService/book.service';
@@ -14,7 +14,7 @@ export class BookFormComponent implements OnInit, OnDestroy {
   @Output() booksChanged = new EventEmitter<Book[]>();
 
   bookForm: FormGroup;
-  books$ = new BehaviorSubject<Book[]>([]); // Store book list reactively
+  books$  !: Observable<Book[]> ; // Store book list reactively
   public unsubscribe$ = new Subject<void>(); // For unsubscribing Observables
 
   constructor(private fb: FormBuilder, private bookService: BookService) {
@@ -35,7 +35,7 @@ export class BookFormComponent implements OnInit, OnDestroy {
   loadBooks() {
     this.bookService.getBooks()
       .pipe(
-        tap(books => {this.books$.next(books);  this.booksChanged.emit(books);}), // Update BehaviorSubject
+        tap(books => {this.booksChanged.emit(books);}), // Update BehaviorSubject
         takeUntil(this.unsubscribe$)
       )
       .subscribe();
@@ -48,7 +48,6 @@ export class BookFormComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap(() => this.bookService.getBooks()), // Refresh list after adding
         tap(books => {
-          this.books$.next(books);
           this.booksChanged.emit(books);
           this.clearForm();
         }),
@@ -62,7 +61,6 @@ export class BookFormComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap(() => this.bookService.getBooks()), // Refresh list after deletion
         tap(books => {
-          this.books$.next(books);
           this.booksChanged.emit(books);
         }),
         takeUntil(this.unsubscribe$)

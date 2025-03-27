@@ -1,4 +1,4 @@
-export class Book {
+export class Book implements book{
     id?: number = 0;
     title: string;
     author: string;
