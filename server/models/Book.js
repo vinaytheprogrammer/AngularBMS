@@ -1,7 +1,7 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const Author = require("./Author");
-const Category = require("./Category");
+import { DataTypes } from "sequelize";
+import sequelize from "../config/database.js";
+import Author from "./Author.js";
+import Category from "./Category.js";
 
 const Book = sequelize.define("Book", {
     title: {
@@ -28,4 +28,4 @@ const Book = sequelize.define("Book", {
 Book.belongsTo(Author, { foreignKey: "author_id", onDelete: "CASCADE" });
 Book.belongsTo(Category, { foreignKey: "category_id", onDelete: "SET NULL" });
 
-module.exports = Book;
+export default Book;

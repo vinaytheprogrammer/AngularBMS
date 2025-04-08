@@ -1,13 +1,14 @@
-const express = require("express");
-const cors = require("cors");
-const mysql = require("mysql2");
+import express from "express";
+import cors from "cors";
+import mysql from "mysql2";
+
+import sequelize from "./config/database.js";
+import Book from "./models/Book.js";
+import Author from "./models/Author.js";
+import Category from "./models/Category.js";
 
 const app = express();
 const PORT = 3000;
-const sequelize = require("./config/database");
-const Book = require("./models/Book");
-const Author = require("./models/Author");
-const Category = require("./models/Category");
 
 
 // const db = require("./models");
@@ -149,6 +150,27 @@ app.delete("/api/books/:isbn", async (req, res) => {
 
 
 
+ async function connectWithRetry() {
+    const maxRetries = 10;
+    let attempt = 0;
+  
+    while (attempt < maxRetries) {
+      try {
+         await sequelize.authenticate();
+        console.log('✅ DB connected');
+        return;
+      } catch (err) {
+        attempt++;
+        console.log(`⏳ Attempt ${attempt} failed: ${err.message}`);
+        await new Promise((res) => setTimeout(res, 3000));
+      }
+    }
+  
+    throw new Error("❌ Could not connect to DB after multiple attempts");
+  }
+
+   await connectWithRetry();
+   
 sequelize.sync()
     .then(() => console.log("Database synchronized"))
     .catch((err) => console.error("Error syncing database:", err));
